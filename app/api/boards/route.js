@@ -2,7 +2,7 @@ import connectDB from "@/config/database";
 import Board from "@/models/Board";
 import { getSessionUser } from "@/utils/getSessionUser";
 
-export const GET = async (req, res) => {
+export const GET = async (req, { params }) => {
   try {
     await connectDB();
     const sessionUser = await getSessionUser();

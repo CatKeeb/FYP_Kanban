@@ -1,6 +1,7 @@
 import connectDB from "@/config/database";
 import { hashPassword } from "@/utils/auth";
 import User from "@/models/User";
+import sanitizeHtml from 'sanitize-html';
 
 export async function POST(request) {
   await connectDB();

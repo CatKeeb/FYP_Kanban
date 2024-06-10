@@ -1,6 +1,6 @@
 import React from "react";
 import CreateBoard from "@/components/CreateBoard";
-import { fetchBoards } from "@/utils/request";
+import { fetchBoards } from "@/utils/getBoards";
 import BoardCard from "@/components/BoardCard";
 
 const BoardsPage = async () => {

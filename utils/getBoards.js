@@ -2,8 +2,8 @@ import { headers } from "next/headers";
 
 const apiDomain = process.env.NEXT_PUBLIC_API_DOMAIN || null;
 
-// Fetch board infomation
-async function fetchBoards(userId) {
+// Fetch boards infomation
+async function fetchBoards() {
   try {
     const response = await fetch(`${apiDomain}/boards`, {
       cache: "no-store",
