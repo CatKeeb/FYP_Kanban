@@ -5,10 +5,13 @@ import { getSessionUser } from "@/utils/getSessionUser";
 export const GET = async (req, { params }) => {
   try {
     await connectDB();
+    // Get the user's session
     const sessionUser = await getSessionUser();
     const { userId } = sessionUser;
     const { id: boardId } = params;
     console.log("userId : ", userId);
+
+    // Find the board by boardId and check if the user is the owner or a member
     const board = await Board.findOne({
       _id: boardId,
       $or: [{ owner: userId }, { members: { $in: [userId] } }],

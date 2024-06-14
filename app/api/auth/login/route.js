@@ -10,7 +10,7 @@ export async function POST(request) {
       JSON.stringify({ error: "Email and password are required" }),
       {
         status: 400,
-      }
+      },
     );
   }
 
@@ -35,9 +35,6 @@ export async function POST(request) {
     console.log("User logged in successfully:");
     console.log("Email:", user.email);
     console.log("Name:", user.firstName + " " + user.lastName);
-
-    // At this point, the user is authenticated.
-    // You might want to generate a JWT or similar for the user to use for future authenticated requests.
 
     return new Response(JSON.stringify({ message: "Login successful" }), {
       status: 200,

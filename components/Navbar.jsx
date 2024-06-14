@@ -5,7 +5,18 @@ import { signIn, signOut, useSession, getProviders } from "next-auth/react";
 import Link from "next/link";
 
 const Navbar = () => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (status !== "loading") {
+      setLoading(false);
+    }
+  }, [status]);
+
+  if (loading) {
+    return null; // or you can render a loading state
+  }
 
   return (
     <div className="navbar bg-base-100">
