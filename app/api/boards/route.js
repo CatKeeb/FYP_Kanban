@@ -1,5 +1,6 @@
 import connectDB from "@/config/database";
 import Board from "@/models/Board";
+import User from "@/models/User";
 import { getSessionUser } from "@/utils/getSessionUser";
 
 export const GET = async (req, { params }) => {
@@ -33,21 +34,54 @@ export const POST = async (req, res) => {
     const { userId } = sessionUser;
     // Get the form data from the request
     const formData = await req.formData();
+
+    // Get the members string and split it into an array of emails
+    const membersEmails = formData.get("members")
+      ? formData
+          .get("members")
+          .split(",")
+          .map((email) => email.trim())
+      : [];
+
+    // Find users by their emails
+    const members = await User.find({ email: { $in: membersEmails } });
+
+    // Check if all emails correspond to existing users
+    const foundEmails = members.map((member) => member.email);
+    const notFoundEmails = membersEmails.filter(
+      (email) => !foundEmails.includes(email),
+    );
+
+    if (notFoundEmails.length > 0) {
+      return new Response(
+        `The following emails were not found: ${notFoundEmails.join(", ")}`,
+        { status: 400 },
+      );
+    }
+
+    // Create a new array of member IDs, excluding the owner's ID and any duplicates
+    const memberIds = Array.from(
+      new Set([...members.map((member) => member._id), userId]),
+    );
+
     // Create a new board object with the form data
+
     const boardData = {
       title: formData.get("title"),
       description: formData.get("description"),
       owner: userId,
+      members: memberIds,
       tasks: [],
     };
     // Create a new board document in the database and save it
     const newBoard = await Board.create(boardData);
     await newBoard.save();
 
-    // Redirect the user to the newly created board's page
-    return Response.redirect(
-      `${process.env.NEXTAUTH_URL}/boards/${newBoard._id}`,
-    );
+    // Return the new board's ID
+    return new Response(JSON.stringify({ boardId: newBoard._id }), {
+      status: 201,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
     console.log(error.message);
     return new Response(error.message, { status: 500 });

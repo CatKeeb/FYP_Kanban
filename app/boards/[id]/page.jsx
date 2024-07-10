@@ -7,6 +7,8 @@ import { fetchBoard } from "@/utils/getBoard";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import TaskAlert from "@/components/TaskAlert";
+import { useRouter } from "next/navigation";
+import Loading from "@/components/Loading";
 
 const Boardpage = () => {
   const { id: boardId } = useParams();
@@ -17,15 +19,45 @@ const Boardpage = () => {
   const [ShowCreateAlert, setShowCreateAlert] = useState(false);
   const [ShowStageUpdateAlert, setShowStageUpdateAlert] = useState(false);
   const [stage, setStage] = useState(null);
+  const [boardMembers, setBoardMembers] = useState([]);
+  const router = useRouter();
 
   const fetchBoardData = async () => {
     try {
       const data = await fetchBoard(boardId);
+      if (!data) {
+        router.push("/404"); // Redirect to 404 page if board is empty or doesn't exist
+        return;
+      }
       setBoard(data);
+
+      // Fetch user details for board members
+      const memberDetails = await fetchUserDetails(data.members);
+      setBoardMembers(memberDetails);
       setLoading(false);
     } catch (error) {
       setError(error.message);
       setLoading(false);
+    }
+  };
+  const fetchUserDetails = async (userIds) => {
+    try {
+      const response = await fetch("/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userIds }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user details");
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+      return [];
     }
   };
 
@@ -62,7 +94,7 @@ const Boardpage = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   if (error) {
@@ -89,7 +121,10 @@ const Boardpage = () => {
       <div className="m-4 flex items-center justify-start p-4">
         <h1 className="text-2xl font-bold">{board.title}</h1>
         <div className="ml-4">
-          <CreateTask onTaskCreated={handleTaskCreated} />
+          <CreateTask
+            onTaskCreated={handleTaskCreated}
+            boardMembers={boardMembers}
+          />
         </div>
       </div>
       <div className="relative grid grid-cols-4 gap-4">

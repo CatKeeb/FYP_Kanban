@@ -17,7 +17,7 @@ export const GET = async (req, { params }) => {
       $or: [{ owner: userId }, { members: { $in: [userId] } }],
     });
 
-    if (!board) {
+    if (!board || board === null) {
       return new Response("Board not found or unauthorized access", {
         status: 404,
       });

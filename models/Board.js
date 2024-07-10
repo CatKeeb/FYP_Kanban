@@ -42,10 +42,19 @@ const taskSchema = new Schema({
     enum: ["Backlog", "Doing", "Review", "Done"],
     default: "Backlog",
   },
-  dueDate: Date,
+  dueDate: {
+    type: Date,
+    required: true,
+  },
   assignee: {
-    _id: Schema.Types.ObjectId,
-    firstName: String,
+    _id: {
+      type: Schema.Types.ObjectId,
+      required: true,
+    },
+    firstName: {
+      type: String,
+      required: true,
+    },
   },
   comments: [commentSchema],
   attachments: [attachmentSchema],

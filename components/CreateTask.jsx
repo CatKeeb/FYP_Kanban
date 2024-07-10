@@ -1,15 +1,73 @@
 "use client";
 import React, { useState } from "react";
 import { useParams } from "next/navigation";
+import ErrorMessage from "./ErrorMessage";
 
-const CreateTask = ({ onTaskCreated }) => {
+const CreateTask = ({ onTaskCreated, boardMembers }) => {
   const { id: boardId } = useParams();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState("medium");
+  const [dueDate, setDueDate] = useState("");
+  const [assignee, setAssignee] = useState({ _id: "", firstName: "" });
+  const [error, setError] = useState(null);
+
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case "low":
+        return "text-green-500";
+      case "medium":
+        return "text-yellow-500";
+      case "high":
+        return "text-red-500";
+      default:
+        return "";
+    }
+  };
+  const handleAssigneeChange = (e) => {
+    const selectedMember = boardMembers.find(
+      (member) => member._id === e.target.value,
+    );
+    if (selectedMember) {
+      setAssignee({
+        _id: selectedMember._id,
+        firstName: selectedMember.firstName,
+      });
+    } else {
+      setAssignee({ _id: "", firstName: "" });
+    }
+  };
+
+  const clearFormFields = () => {
+    setTitle("");
+    setDescription("");
+    setPriority("medium");
+    setDueDate("");
+    setAssignee({ _id: "", firstName: "" });
+    setError(null);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!title) {
+      setError("Please enter a title.");
+      return;
+    }
 
+    if (!dueDate) {
+      setError("Please select a due date.");
+      return;
+    }
+
+    if (!priority) {
+      setError("Please select a priority.");
+      return;
+    }
+
+    if (!assignee._id) {
+      setError("Please select an assignee.");
+      return;
+    }
     try {
       const response = await fetch("/api/tasks", {
         method: "POST",
@@ -20,6 +78,12 @@ const CreateTask = ({ onTaskCreated }) => {
           boardId,
           title,
           description,
+          priority,
+          dueDate,
+          assignee: {
+            _id: assignee._id,
+            firstName: assignee.firstName,
+          },
         }),
       });
 
@@ -28,8 +92,7 @@ const CreateTask = ({ onTaskCreated }) => {
         const data = await response.json();
         console.log("Task created:", data);
         // Reset form fields
-        setTitle("");
-        setDescription("");
+        clearFormFields();
         // Close the modal
         document.getElementById("create_task_modal").close();
         onTaskCreated();
@@ -56,9 +119,8 @@ const CreateTask = ({ onTaskCreated }) => {
       >
         <div className="modal-box">
           <h3 className="mb-3 text-center text-lg font-bold">Create Task</h3>
+          {error && <ErrorMessage message={error} />}
           <form
-            action="/api/tasks"
-            method="POST"
             encType="multipart/form-data"
             className="flex flex-col items-center space-y-4"
           >
@@ -73,7 +135,7 @@ const CreateTask = ({ onTaskCreated }) => {
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Enter task title"
                 required
-                className="input input-bordered w-full max-w-xs"
+                className="input input-bordered w-full max-w-xs font-bold"
               />
             </div>
             <div className="form-control w-full max-w-xs">
@@ -88,6 +150,61 @@ const CreateTask = ({ onTaskCreated }) => {
                 className="textarea textarea-bordered w-full max-w-xs"
               ></textarea>
             </div>
+            <div className="form-control w-full max-w-xs">
+              <label className="label">
+                <span className="label-text">Priority</span>
+              </label>
+              <select
+                name="priority"
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+                className={`select select-bordered w-full max-w-xs font-bold ${getPriorityColor(priority)}`}
+              >
+                <option value="low" className="font-bold text-green-500">
+                  Low
+                </option>
+                <option value="medium" className="font-bold text-yellow-500">
+                  Medium
+                </option>
+                <option value="high" className="font-bold text-red-500">
+                  High
+                </option>
+              </select>
+            </div>
+            <div className="form-control w-full max-w-xs">
+              <label className="label">
+                <span className="label-text">Due Date</span>
+              </label>
+              <input
+                type="date"
+                name="dueDate"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className="input input-bordered w-full max-w-xs"
+                required
+              />
+            </div>
+            <div className="form-control w-full max-w-xs">
+              <label className="label">
+                <span className="label-text">Assignee</span>
+              </label>
+              <select
+                name="assignee"
+                value={assignee._id}
+                onChange={handleAssigneeChange}
+                className="select select-bordered w-full max-w-xs"
+                required
+              >
+                <option value="" disabled>
+                  Select a member
+                </option>
+                {boardMembers.map((member) => (
+                  <option key={member._id} value={member._id}>
+                    {member.firstName}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="modal-action justify-end space-x-2">
               <button
                 onClick={handleSubmit}
@@ -99,9 +216,10 @@ const CreateTask = ({ onTaskCreated }) => {
               <button
                 type="button"
                 className="btn"
-                onClick={() =>
-                  document.getElementById("create_task_modal").close()
-                }
+                onClick={() => {
+                  clearFormFields();
+                  document.getElementById("create_task_modal").close();
+                }}
               >
                 Close
               </button>

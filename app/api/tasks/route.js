@@ -15,16 +15,16 @@ export const POST = async (req, res) => {
     }
 
     // Extract from the request body
-    const { boardId, title, description } = await req.json();
+    const { boardId, title, description, priority, dueDate, assignee } =
+      await req.json();
 
     // Create a new task object with the extracted data
     const taskData = {
       title,
       description,
-      assignee: {
-        _id: sessionUser._id,
-        firstName: sessionUser.firstName,
-      },
+      assignee,
+      priority,
+      dueDate,
       comments: [],
       attachments: [],
     };
