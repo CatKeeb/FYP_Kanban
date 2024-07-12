@@ -7,18 +7,18 @@ const CreateTask = ({ onTaskCreated, boardMembers }) => {
   const { id: boardId } = useParams();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState("medium");
+  const [priority, setPriority] = useState("Medium");
   const [dueDate, setDueDate] = useState("");
   const [assignee, setAssignee] = useState({ _id: "", firstName: "" });
   const [error, setError] = useState(null);
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case "low":
+      case "Low":
         return "text-green-500";
-      case "medium":
+      case "Medium":
         return "text-yellow-500";
-      case "high":
+      case "High":
         return "text-red-500";
       default:
         return "";
@@ -41,7 +41,7 @@ const CreateTask = ({ onTaskCreated, boardMembers }) => {
   const clearFormFields = () => {
     setTitle("");
     setDescription("");
-    setPriority("medium");
+    setPriority("Medium");
     setDueDate("");
     setAssignee({ _id: "", firstName: "" });
     setError(null);
@@ -160,13 +160,13 @@ const CreateTask = ({ onTaskCreated, boardMembers }) => {
                 onChange={(e) => setPriority(e.target.value)}
                 className={`select select-bordered w-full max-w-xs font-bold ${getPriorityColor(priority)}`}
               >
-                <option value="low" className="font-bold text-green-500">
+                <option value="Low" className="font-bold text-green-500">
                   Low
                 </option>
-                <option value="medium" className="font-bold text-yellow-500">
+                <option value="Medium" className="font-bold text-yellow-500">
                   Medium
                 </option>
-                <option value="high" className="font-bold text-red-500">
+                <option value="High" className="font-bold text-red-500">
                   High
                 </option>
               </select>

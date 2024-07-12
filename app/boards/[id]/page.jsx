@@ -127,7 +127,7 @@ const Boardpage = () => {
           />
         </div>
       </div>
-      <div className="relative grid grid-cols-4 gap-4">
+      <div className="relative grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
         {stages.map((stage) => (
           <StageColumn
             key={stage}
@@ -147,6 +147,9 @@ const Boardpage = () => {
                   onTaskCreated={handleTaskCreated}
                   onTaskDelete={handleTaskDelete}
                   onStageUpdate={handleUpdateStage}
+                  priority={task.priority}
+                  dueDate={task.dueDate}
+                  assignee={task.assignee}
                 />
               ))}
           </StageColumn>

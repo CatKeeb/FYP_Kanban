@@ -1,8 +1,8 @@
 "use client";
-import React from "react";
-import { useState, useEffect } from "react";
-import { signIn, signOut, useSession, getProviders } from "next-auth/react";
+import React, { useState, useEffect } from "react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import Loading from "@/components/Loading";
 
 const Navbar = () => {
   const { data: session, status } = useSession();
@@ -15,7 +15,7 @@ const Navbar = () => {
   }, [status]);
 
   if (loading) {
-    return null; // or you can render a loading state
+    return <Loading />;
   }
 
   return (
@@ -23,7 +23,7 @@ const Navbar = () => {
       <div className="flex-1">
         <a className="btn btn-ghost text-xl">KanFlow</a>
       </div>
-      {session && (
+      {session ? (
         <>
           <div className="flex-none">
             <ul className="menu menu-horizontal">
@@ -49,8 +49,11 @@ const Navbar = () => {
               >
                 <div className="w-10 rounded-full">
                   <img
-                    alt="Tailwind CSS Navbar component"
-                    src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
+                    alt="User Avatar"
+                    src={
+                      session.user.image ||
+                      "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
+                    }
                   />
                 </div>
               </div>
@@ -74,6 +77,12 @@ const Navbar = () => {
             </div>
           </div>
         </>
+      ) : (
+        <div className="flex-none">
+          <Link href="/login">
+            <button className="btn">Sign In</button>
+          </Link>
+        </div>
       )}
     </div>
   );
