@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import TaskAlert from "@/components/TaskAlert";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
+import io from "socket.io-client";
 
 const Boardpage = () => {
   const { id: boardId } = useParams();
@@ -63,6 +64,25 @@ const Boardpage = () => {
 
   useEffect(() => {
     fetchBoardData();
+
+    const socket = io();
+
+    socket.on("connect", () => {
+      console.log("Connected to WebSocket");
+      socket.emit("watchBoard", boardId);
+    });
+
+    socket.on("boardUpdate", (data) => {
+      if (data.boardId === boardId) {
+        console.log("Board updated, refetching data");
+        fetchBoardData();
+      }
+    });
+
+    return () => {
+      socket.off("boardUpdate");
+      socket.disconnect();
+    };
   }, [boardId]);
 
   const handleTaskCreated = () => {

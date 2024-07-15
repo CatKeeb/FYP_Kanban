@@ -1,4 +1,5 @@
-import { Schema, model, models } from "mongoose";
+import mongoose from "mongoose";
+const { Schema, model, models } = mongoose;
 
 const commentSchema = new Schema({
   user: {
@@ -84,4 +85,4 @@ const boardSchema = new Schema({
 
 const Board = models.Board || model("Board", boardSchema);
 
-module.exports = Board;
+export default Board;
