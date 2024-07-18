@@ -3,6 +3,15 @@ import { getSessionUser } from "@/utils/getSessionUser";
 import Board from "@/models/Board";
 import { ObjectId } from "mongodb";
 
+// Helper function to check if the user is a board member
+async function isBoardMember(boardId, userId) {
+  const board = await Board.findOne({
+    _id: boardId,
+    $or: [{ owner: userId }, { members: userId }],
+  });
+  return !!board;
+}
+
 export const POST = async (req, res) => {
   try {
     await connectDB();
@@ -18,6 +27,12 @@ export const POST = async (req, res) => {
     const { boardId, title, description, priority, dueDate, assignee } =
       await req.json();
 
+    // Check if the user is a board member
+    if (!(await isBoardMember(boardId, sessionUser.userId))) {
+      return new Response("Forbidden: You are not a member of this board", {
+        status: 403,
+      });
+    }
     // Create a new task object with the extracted data
     const taskData = {
       title,
@@ -62,8 +77,16 @@ export const PATCH = async (req, res) => {
     if (!sessionUser || !sessionUser.userId) {
       return new Response("Unauthorized", { status: 401 });
     }
+
     // Extract from the request body
     const { boardId, taskId, title, description, stage } = await req.json();
+
+    // Check if the user is a board member
+    if (!(await isBoardMember(boardId, sessionUser.userId))) {
+      return new Response("Forbidden: You are not a member of this board", {
+        status: 403,
+      });
+    }
 
     // Find the board and update the specific task
     const updatedBoard = await Board.findOneAndUpdate(
@@ -111,6 +134,13 @@ export const DELETE = async (req, res) => {
 
     // Extract the boardId and taskId from the request body
     const { boardId, taskId } = await req.json();
+
+    // Check if the user is a board member
+    if (!(await isBoardMember(boardId, sessionUser.userId))) {
+      return new Response("Forbidden: You are not a member of this board", {
+        status: 403,
+      });
+    }
 
     // Find the board and update it by removing the task
     const result = await Board.findOneAndUpdate(

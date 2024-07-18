@@ -22,7 +22,7 @@ app.prepare().then(() => {
   // Initialize Socket.IO
   const io = new Server(server);
 
-  // handle new socket connections from api/socket/
+  // handle new socket connections
   io.on("connection", (socket) => {
     console.log("New client connected");
 

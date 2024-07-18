@@ -1,7 +1,7 @@
 import React from "react";
 import { updateTask } from "@/utils/updateTask";
 import { deleteTask } from "@/utils/deleteTask";
-import { format, isValid } from "date-fns";
+import { format } from "date-fns";
 
 const TaskCard = ({
   title,
@@ -153,6 +153,9 @@ const TaskCard = ({
       </div>
       <div className="mt-2 flex items-center justify-between pt-2">
         <p className="text-sm font-semibold">Due Date: {formattedDueDate}</p>
+      </div>
+      <div className="mt-2 flex items-center justify-between pt-2">
+        <p className="text-sm font-semibold">{assignee.firstName}</p>
       </div>
     </div>
   );
