@@ -35,12 +35,6 @@ describe("Board API", () => {
     };
   });
 
-  afterEach(async () => {
-    // Clean up the database after each test
-    await Board.deleteMany({});
-    await User.deleteMany({});
-  });
-
   describe("GET /api/boards", () => {
     it("should return boards for the user", async () => {
       // Create a test board

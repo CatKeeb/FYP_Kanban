@@ -12,15 +12,6 @@ jest.mock("mongodb", () => ({
   ObjectId: jest.fn((id) => id),
 }));
 
-// Mock the Board model
-jest.mock("@/models/Board", () => ({
-  findByIdAndUpdate: jest.fn(),
-  findOneAndUpdate: jest.fn(),
-}));
-
-// Import the mocked Board after mocking
-const Board = require("@/models/Board");
-
 describe("Task API", () => {
   let mockUserId;
 
@@ -43,11 +34,6 @@ describe("Task API", () => {
           firstName: "John",
         },
       };
-
-      Board.findByIdAndUpdate.mockResolvedValue({
-        _id: mockTaskData.boardId,
-        tasks: [{ ...mockTaskData, _id: new ObjectId().toString() }],
-      });
 
       const response = await POST({ ...mockTaskData, userId: mockUserId });
 
@@ -77,22 +63,6 @@ describe("Task API", () => {
         stage: "Doing",
       };
 
-      Board.findOneAndUpdate.mockResolvedValue({
-        _id: mockUpdateData.boardId,
-        tasks: [
-          {
-            _id: mockUpdateData.taskId,
-            ...mockUpdateData,
-            priority: "High",
-            dueDate: new Date(),
-            assignee: {
-              _id: new ObjectId().toString(),
-              firstName: "John",
-            },
-          },
-        ],
-      });
-
       const response = await PATCH({ ...mockUpdateData, userId: mockUserId });
 
       expect(response.status).toBe(200);
@@ -113,11 +83,6 @@ describe("Task API", () => {
         boardId: new ObjectId().toString(),
         taskId: new ObjectId().toString(),
       };
-
-      Board.findOneAndUpdate.mockResolvedValue({
-        _id: mockDeleteData.boardId,
-        tasks: [], // Simulating that the task was removed
-      });
 
       const response = await DELETE({ ...mockDeleteData, userId: mockUserId });
 
