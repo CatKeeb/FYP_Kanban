@@ -108,7 +108,7 @@ const CreateTask = ({ onTaskCreated, boardMembers }) => {
   return (
     <div>
       <button
-        className="btn"
+        className="btn btn-primary"
         onClick={() => document.getElementById("create_task_modal").showModal()}
       >
         Create Task

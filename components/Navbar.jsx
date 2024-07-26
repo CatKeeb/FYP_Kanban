@@ -29,7 +29,7 @@ const Navbar = () => {
             <ul className="menu menu-horizontal">
               <li>
                 <Link href="/boards" className="btn btn-ghost">
-                  Boards
+                  My Boards
                 </Link>
               </li>
             </ul>
