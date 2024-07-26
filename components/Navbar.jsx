@@ -32,12 +32,6 @@ const Navbar = () => {
                   Boards
                 </Link>
               </li>
-              <li>
-                <a className="btn btn-ghost">Manage</a>
-              </li>
-              <li>
-                <a className="btn btn-ghost">Add Tasks</a>
-              </li>
             </ul>
           </div>
           <div className="flex-none gap-2">

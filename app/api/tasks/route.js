@@ -1,39 +1,20 @@
 import connectDB from "@/config/database";
-import { getSessionUser } from "@/utils/getSessionUser";
 import Board from "@/models/Board";
 import { ObjectId } from "mongodb";
+import { authenticateAndAuthorize } from "@/utils/boardAuthUtils";
 
-// Helper function to check if the user is a board member
-async function isBoardMember(boardId, userId) {
-  const board = await Board.findOne({
-    _id: boardId,
-    $or: [{ owner: userId }, { members: userId }],
-  });
-  return !!board;
-}
-
-export const POST = async (req, res) => {
+export const POST = async (req) => {
   try {
     await connectDB();
 
-    // Get the user's session
-    const sessionUser = await getSessionUser();
-    // Check if the user is authenticated
-    if (!sessionUser || !sessionUser.userId) {
-      return new Response("Unauthorized", { status: 401 });
+    const authResult = await authenticateAndAuthorize(req);
+    if (authResult.error) {
+      return new Response(authResult.error, { status: authResult.status });
     }
 
-    // Extract from the request body
-    const { boardId, title, description, priority, dueDate, assignee } =
-      await req.json();
+    const { body } = authResult;
+    const { boardId, title, description, priority, dueDate, assignee } = body;
 
-    // Check if the user is a board member
-    if (!(await isBoardMember(boardId, sessionUser.userId))) {
-      return new Response("Forbidden: You are not a member of this board", {
-        status: 403,
-      });
-    }
-    // Create a new task object with the extracted data
     const taskData = {
       title,
       description,
@@ -68,31 +49,21 @@ export const POST = async (req, res) => {
   }
 };
 
-export const PATCH = async (req, res) => {
+export const PATCH = async (req) => {
   try {
     await connectDB();
 
-    // Get the authenticated user's session information
-    const sessionUser = await getSessionUser();
-    if (!sessionUser || !sessionUser.userId) {
-      return new Response("Unauthorized", { status: 401 });
+    const authResult = await authenticateAndAuthorize(req);
+    if (authResult.error) {
+      return new Response(authResult.error, { status: authResult.status });
     }
 
-    // Extract from the request body
-    const { boardId, taskId, title, description, stage } = await req.json();
-
-    // Check if the user is a board member
-    if (!(await isBoardMember(boardId, sessionUser.userId))) {
-      return new Response("Forbidden: You are not a member of this board", {
-        status: 403,
-      });
-    }
+    const { body } = authResult;
+    const { boardId, taskId, title, description, stage } = body;
 
     // Find the board and update the specific task
     const updatedBoard = await Board.findOneAndUpdate(
-      // Find the board with the specified boardId and taskId
       { _id: boardId, "tasks._id": taskId },
-      // Update the task
       {
         $set: {
           "tasks.$.title": title,
@@ -100,7 +71,7 @@ export const PATCH = async (req, res) => {
           "tasks.$.stage": stage,
         },
       },
-      { new: true }, // Return the updated document
+      { new: true },
     );
 
     if (!updatedBoard) {
@@ -108,7 +79,6 @@ export const PATCH = async (req, res) => {
     }
 
     const updatedTask = updatedBoard.tasks.id(taskId);
-    // Return the updated task
     return new Response(JSON.stringify(updatedTask), {
       status: 200,
       headers: {
@@ -121,46 +91,31 @@ export const PATCH = async (req, res) => {
   }
 };
 
-export const DELETE = async (req, res) => {
+export const DELETE = async (req) => {
   try {
     await connectDB();
 
-    // Get the authenticated user's session information
-    const sessionUser = await getSessionUser();
-    // Check if the user is authenticated
-    if (!sessionUser || !sessionUser.userId) {
-      return new Response("Unauthorized", { status: 401 });
+    const authResult = await authenticateAndAuthorize(req);
+    if (authResult.error) {
+      return new Response(authResult.error, { status: authResult.status });
     }
 
-    // Extract the boardId and taskId from the request body
-    const { boardId, taskId } = await req.json();
+    const { sessionUser, body } = authResult;
+    const { boardId, taskId } = body;
 
-    // Check if the user is a board member
-    if (!(await isBoardMember(boardId, sessionUser.userId))) {
-      return new Response("Forbidden: You are not a member of this board", {
-        status: 403,
-      });
-    }
-
-    // Find the board and update it by removing the task
     const result = await Board.findOneAndUpdate(
       {
-        // Find the board with the specified boardId
         _id: ObjectId.createFromHexString(boardId),
-        // Check if the user is the owner or a member of the board
         $or: [
           { owner: ObjectId.createFromHexString(sessionUser.userId) },
           { members: ObjectId.createFromHexString(sessionUser.userId) },
         ],
-        // Find the task within the board with the specified taskId
         "tasks._id": ObjectId.createFromHexString(taskId),
       },
-      // Remove the task from the tasks array using the $pull operator
       { $pull: { tasks: { _id: ObjectId.createFromHexString(taskId) } } },
-      { new: true }, // Return the updated document
+      { new: true },
     );
 
-    // If no matching board is found or the user doesn't have permission
     if (!result) {
       return new Response(
         "No matching board found or you do not have permission",
