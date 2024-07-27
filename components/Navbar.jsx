@@ -19,7 +19,7 @@ const Navbar = () => {
   }
 
   return (
-    <div className="navbar bg-base-100">
+    <div className="navbar bg-blue-50">
       <div className="flex-1">
         <a className="btn btn-ghost text-xl">KanFlow</a>
       </div>

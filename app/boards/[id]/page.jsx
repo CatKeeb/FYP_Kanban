@@ -14,6 +14,7 @@ import { searchTasks } from "@/utils/searchTasks";
 import { fetchUserDetails } from "@/utils/getUserDetails";
 import { getClientSessionUser } from "@/utils/clientSessionUser";
 import { debounce } from "@/utils/debounce";
+import TaskCalendar from "@/components/TaskCalendar";
 
 const Boardpage = () => {
   const { id: boardId } = useParams();
@@ -31,6 +32,7 @@ const Boardpage = () => {
   const [sortByPriority, setSortByPriority] = useState(false);
   const [sortByDueDate, setSortByDueDate] = useState(false);
   const [sessionUser, setSessionUser] = useState(null);
+  const [viewMode, setViewMode] = useState("board");
   const router = useRouter();
 
   const toggleFilterMyTasks = () => {
@@ -73,14 +75,7 @@ const Boardpage = () => {
     }
 
     return tasks;
-  }, [
-    searchResults,
-    board,
-    filterMyTasks,
-    sessionUser,
-    sortByPriority,
-    sortByDueDate,
-  ]);
+  }, [searchResults, board, filterMyTasks, sortByPriority, sortByDueDate]);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -111,12 +106,11 @@ const Boardpage = () => {
     try {
       const data = await fetchBoard(boardId);
       if (!data) {
-        router.push("/404"); // Redirect to 404 page if board is empty or doesn't exist
+        router.push("/404");
         return;
       }
       setBoard(data);
 
-      // Fetch user details for board members
       const memberDetails = await fetchUserDetails(data.members);
       setBoardMembers(memberDetails);
       setLoading(false);
@@ -293,40 +287,56 @@ const Boardpage = () => {
             </div>
           </div>
         </div>
-      </div>
-      {searchTerm && (
-        <div className="mt-2 w-full text-center text-lg text-gray-600">
-          Searching for: "{searchTerm}"
-        </div>
-      )}
 
-      <div className="relative grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
-        {stages.map((stage) => (
-          <StageColumn
-            key={stage}
-            stage={stage}
-            backgroundColor={stageColors[stage]}
+        <div className="my-4 flex justify-center">
+          <button
+            className="btn btn-primary"
+            onClick={() =>
+              setViewMode(viewMode === "board" ? "calendar" : "board")
+            }
           >
-            {tasksToDisplay
-              .filter((task) => task.stage === stage)
-              .map((task) => (
-                <TaskCard
-                  key={task._id}
-                  title={task.title}
-                  description={task.description}
-                  stage={task.stage}
-                  boardId={boardId}
-                  taskId={task._id}
-                  onTaskCreated={handleTaskCreated}
-                  onTaskDelete={handleTaskDelete}
-                  onStageUpdate={handleUpdateStage}
-                  priority={task.priority}
-                  dueDate={task.dueDate}
-                  assignee={task.assignee}
-                />
-              ))}
-          </StageColumn>
-        ))}
+            Switch to {viewMode === "board" ? "Calendar" : "Board"} View
+          </button>
+        </div>
+
+        {searchTerm && (
+          <div className="mt-2 w-full text-center text-lg text-gray-600">
+            Searching for: "{searchTerm}"
+          </div>
+        )}
+
+        {viewMode === "board" ? (
+          <div className="relative grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
+            {stages.map((stage) => (
+              <StageColumn
+                key={stage}
+                stage={stage}
+                backgroundColor={stageColors[stage]}
+              >
+                {tasksToDisplay
+                  .filter((task) => task.stage === stage)
+                  .map((task) => (
+                    <TaskCard
+                      key={task._id}
+                      title={task.title}
+                      description={task.description}
+                      stage={task.stage}
+                      boardId={boardId}
+                      taskId={task._id}
+                      onTaskCreated={handleTaskCreated}
+                      onTaskDelete={handleTaskDelete}
+                      onStageUpdate={handleUpdateStage}
+                      priority={task.priority}
+                      dueDate={task.dueDate}
+                      assignee={task.assignee}
+                    />
+                  ))}
+              </StageColumn>
+            ))}
+          </div>
+        ) : (
+          <TaskCalendar tasks={tasksToDisplay} />
+        )}
       </div>
     </div>
   );

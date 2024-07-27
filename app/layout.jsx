@@ -5,7 +5,7 @@ import AuthProvider from "@/components/AuthProvider";
 
 const layout = ({ children }) => {
   return (
-    <html>
+    <html className="bg-blue-50">
       <body>
         <AuthProvider>
           <Navbar />
