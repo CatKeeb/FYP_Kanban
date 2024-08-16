@@ -3,6 +3,8 @@ import { Server } from "socket.io";
 import connectDB from "@/config/database";
 import { ObjectId } from "mongodb";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request) {
   if (global.io) {
     return NextResponse.json({ message: "Socket is already running" });
