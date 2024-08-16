@@ -3,6 +3,9 @@ import CreateBoard from "@/components/CreateBoard";
 import { fetchBoards } from "@/utils/getBoards";
 import BoardCard from "@/components/BoardCard";
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+
 const BoardsPage = async () => {
   const boards = await fetchBoards();
 

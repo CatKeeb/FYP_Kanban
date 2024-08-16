@@ -28,9 +28,9 @@ const Navbar = () => {
           <div className="flex-none">
             <ul className="menu menu-horizontal">
               <li>
-                <Link href="/boards" className="btn btn-ghost">
+                <a href="/boards" className="btn btn-ghost">
                   My Boards
-                </Link>
+                </a>
               </li>
             </ul>
           </div>
