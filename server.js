@@ -4,6 +4,7 @@ const next = require("next");
 const { Server } = require("socket.io");
 const { MongoClient, ObjectId } = require("mongodb");
 
+const port = process.env.PORT || 3000;
 const dev = process.env.NODE_ENV !== "production";
 // Initialize Next.js app
 const app = next({ dev });
@@ -66,8 +67,8 @@ app.prepare().then(() => {
   });
 
   // Start the server
-  server.listen(3000, (err) => {
+  server.listen(port, (err) => {
     if (err) throw err;
-    console.log("> Ready on http://localhost:3000");
+    console.log(`> Ready on http://localhost:${port}`);
   });
 });
