@@ -13,19 +13,21 @@ const TaskCalendar = ({ tasks }) => {
   const calendarRef = useRef(null);
 
   const tasksToEvents = (tasks) => {
-    return tasks.map((task) => ({
-      id: task._id,
-      title: task.title,
-      start: new Date(task.dueDate),
-      end: new Date(task.dueDate),
-      allDay: true,
-      resource: {
-        ...task,
-        stage: task.stage,
-        priority: task.priority,
-        assignee: task.assignee.firstName,
-      },
-    }));
+    return tasks
+      .filter((task) => task.stage !== "Done")
+      .map((task) => ({
+        id: task._id,
+        title: task.title,
+        start: new Date(task.dueDate),
+        end: new Date(task.dueDate),
+        allDay: true,
+        resource: {
+          ...task,
+          stage: task.stage,
+          priority: task.priority,
+          assignee: task.assignee.firstName,
+        },
+      }));
   };
 
   const handleMouseEnter = (event, e) => {
@@ -64,7 +66,6 @@ const TaskCalendar = ({ tasks }) => {
       Backlog: "bg-gray-300",
       Doing: "bg-blue-200",
       Review: "bg-purple-200",
-      Done: "bg-green-200",
     };
 
     const priorityColors = {

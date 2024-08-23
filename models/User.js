@@ -23,6 +23,18 @@ const UserSchema = new Schema(
       type: String,
       required: [true, "Password is required"],
     },
+    points: {
+      type: Number,
+      default: 0,
+    },
+    level: {
+      type: Number,
+      default: 1,
+    },
+    title: {
+      type: String,
+      default: "Novice",
+    },
   },
   {
     timestamps: true,

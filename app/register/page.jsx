@@ -3,9 +3,11 @@ import React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import TaskAlert from "@/components/TaskAlert";
 
 const RegisterPage = () => {
   const router = useRouter();
+  const [message, setMessage] = useState({});
   const [data, setData] = useState({
     firstName: "",
     lastName: "",
@@ -14,18 +16,40 @@ const RegisterPage = () => {
   });
   const registerUser = async (e) => {
     e.preventDefault();
-    const response = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-    const userInfo = await response.json();
-    console.log(userInfo);
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        setMessage({
+          type: "success",
+          message: "Successfully registered. Please login to your account.",
+        });
+        setTimeout(() => {
+          router.push("/login");
+        }, 3000);
+      } else {
+        setMessage({
+          type: "error",
+          message: "Failed to register. Please try again.",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      setMessage({
+        type: "error",
+        message: `${error.message}`,
+      });
+    }
   };
   return (
     <>
+      <TaskAlert type={message.type} description={message.message} />
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">

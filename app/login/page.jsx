@@ -4,27 +4,46 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import TaskAlert from "@/components/TaskAlert";
 
 const LoginPage = () => {
   const router = useRouter();
+  const [error, setError] = useState({});
   const [data, setData] = useState({
     email: "",
     password: "",
   });
   const loginUser = async (e) => {
     e.preventDefault();
+    setError(""); // Clear any previous errors
     const result = await signIn("credentials", {
       email: data.email,
       password: data.password,
       redirect: false,
     });
-    console.log(result);
+
     if (result.ok) {
       router.push("/");
+    } else {
+      // Handle different error cases
+      if (result.status === 401) {
+        setError({
+          type: "error",
+          message: "Invalid email or password",
+        });
+      } else if (result.status === 500) {
+        setError({
+          type: "error",
+          message: "Internal Server error. Please try again.",
+        });
+      } else {
+        setError("An error occurred. Please try again.");
+      }
     }
   };
   return (
     <>
+      <TaskAlert type={error.type} description={error.message} />
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">

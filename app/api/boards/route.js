@@ -3,10 +3,11 @@ import Board from "@/models/Board";
 import User from "@/models/User";
 import { getSessionUser } from "@/utils/getSessionUser";
 
-export const GET = async (req, { params }) => {
+export const GET = async (req) => {
   try {
     await connectDB();
     const sessionUser = await getSessionUser();
+
     const { userId } = sessionUser;
     const boards = await Board.find({
       $or: [{ owner: userId }, { members: { $in: [userId] } }],

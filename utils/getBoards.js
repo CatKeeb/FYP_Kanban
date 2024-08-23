@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 const apiDomain = process.env.NEXT_PUBLIC_API_DOMAIN || null;
 
@@ -16,6 +17,7 @@ async function fetchBoards() {
     console.log(data);
     return data;
   } catch (error) {
+    redirect("/login");
     console.error(error);
     return [];
   }
