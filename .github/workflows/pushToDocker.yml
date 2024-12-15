@@ -1,4 +1,4 @@
-name : 'Push to Docker'
+name: "Push to Docker"
 on:
   push:
     branches:
@@ -12,8 +12,8 @@ jobs:
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
-            path: ~/.npm
-            key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+          path: ~/.npm
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
       - name: Install dependencies
         run: npm ci
       - name: Test Code
@@ -23,11 +23,49 @@ jobs:
         if: always()
         with:
           name: Test Summary
-          path: reports/jest-*.xml    # Path to test results
-          reporter: jest-junit        # Format of test results
+          path: reports/jest-*.xml # Path to test results
+          reporter: jest-junit # Format of test results
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
       - name: Build Docker image
         run: docker build . -t chonkycat/kanban
       - name: Push Docker image
         run: docker push chonkycat/kanban:latest
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-southeast-1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: "true"
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: latest
+          REPOSITORY: fyp_kanban
+        run: |
+          # Build a docker container and
+          # push it to ECR so that it can
+          # be deployed to ECS.
+          docker build -t $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: fyp_kanban_task_definition.json
+          container-name: fyp_kanban
+          image: ${{ steps.build-image.outputs.image }}
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: fyp_kanban_service
+          cluster: fyp_kanban_cluster
+          wait-for-service-stability: true

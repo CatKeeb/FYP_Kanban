@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="8" failures="0" errors="0" time="2.668">
+  <testsuite name="__tests__/task.test.js" errors="0" failures="0" skipped="0" timestamp="2024-12-13T07:54:38" time="2.477" tests="3">
+    <testcase classname="Task API › POST /api/tasks" name="should create a new task" time="0.015">
+    </testcase>
+    <testcase classname="Task API › PATCH /api/tasks" name="should update an existing task" time="0">
+    </testcase>
+    <testcase classname="Task API › DELETE /api/tasks" name="should delete an existing task" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="__tests__/board.test.js" errors="0" failures="0" skipped="0" timestamp="2024-12-13T07:54:38" time="2.575" tests="5">
+    <testcase classname="Board API › GET /api/boards" name="should return boards for the user" time="0.145">
+    </testcase>
+    <testcase classname="Board API › GET /api/boards" name="should return an empty array if user has no boards" time="0.004">
+    </testcase>
+    <testcase classname="Board API › POST /api/boards" name="should create a new board" time="0.007">
+    </testcase>
+    <testcase classname="Board API › POST /api/boards" name="should return 400 if member email is not found" time="0.002">
+    </testcase>
+    <testcase classname="Board API › POST /api/boards" name="should return 401 if user is not authenticated" time="0.001">
+    </testcase>
+  </testsuite>
+</testsuites>
