@@ -13,8 +13,15 @@ RUN npm install
 # Copy the rest of your app's source code from your host to your image filesystem
 COPY . .
 
+# Build the application
+RUN npm run build
+
 # Expose the port the app runs in
-EXPOSE 3000
+#EXPOSE 3000
+EXPOSE 10000
 
 # Run the specified command within the container
-CMD [ "node", "server.js" ]
+#CMD [ "node", "server.js" ]
+
+# Start the application
+CMD [ "npm", "start" ]
