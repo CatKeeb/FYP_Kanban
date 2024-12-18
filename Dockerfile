@@ -18,7 +18,7 @@ RUN npm run build
 
 # Expose the port the app runs in
 #EXPOSE 3000
-EXPOSE 10000
+EXPOSE 3000
 
 # Run the specified command within the container
 #CMD [ "node", "server.js" ]
