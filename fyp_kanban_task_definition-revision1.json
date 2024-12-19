@@ -1,5 +1,4 @@
 {
-  "taskDefinitionArn": "arn:aws:ecs:ap-southeast-1:086164660957:task-definition/fyp_kanban_task_definition:15",
   "containerDefinitions": [
     {
       "name": "fyp_kanban",
