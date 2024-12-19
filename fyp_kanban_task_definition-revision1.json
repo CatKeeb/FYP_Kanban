@@ -112,6 +112,5 @@
   },
   "registeredAt": "2024-12-18T19:01:22.824Z",
   "registeredBy": "arn:aws:sts::086164660957:assumed-role/AWSReservedSSO_AdministratorAccess_c3cbbc3d573c7583/boeyadmin",
-  "enableFaultInjection": false,
   "tags": []
 }
