@@ -69,3 +69,7 @@ jobs:
           service: fyp_kanban_service
           cluster: fyp_kanban_cluster
           wait-for-service-stability: true
+      - name: Ensure service is running with desired count
+        run: |
+          aws ecs update-service --cluster fyp_kanban_cluster \
+          --service fyp_kanban_service --desired-count 1
