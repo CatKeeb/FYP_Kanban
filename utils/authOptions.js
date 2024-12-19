@@ -51,6 +51,7 @@ export const authOptions = {
       },
     }),
   ],
+  useSecureCookies: process.env.NODE_ENV === "production",
   callbacks: {
     async jwt({ token, user, session }) {
       if (user) {
