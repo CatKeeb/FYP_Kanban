@@ -1,9 +1,9 @@
 {
-  "taskDefinitionArn": "arn:aws:ecs:ap-southeast-1:086164660957:task-definition/fyp_kanban_task_definition:1",
+  "taskDefinitionArn": "arn:aws:ecs:ap-southeast-1:086164660957:task-definition/fyp_kanban_task_definition:15",
   "containerDefinitions": [
     {
       "name": "fyp_kanban",
-      "image": "086164660957.dkr.ecr.ap-southeast-1.amazonaws.com/fyp_kanban",
+      "image": "086164660957.dkr.ecr.ap-southeast-1.amazonaws.com/fyp_kanban:latest",
       "cpu": 0,
       "portMappings": [
         {
@@ -15,11 +15,38 @@
         }
       ],
       "essential": true,
-      "environment": [],
-      "environmentFiles": [],
+      "environment": [
+        {
+          "name": "LOCAL_DOMAIN",
+          "value": "kanbanLoadBalancer-125325032.ap-southeast-1.elb.amazonaws.com"
+        },
+        {
+          "name": "NEXT_PUBLIC_API_DOMAIN",
+          "value": "kanbanLoadBalancer-125325032.ap-southeast-1.elb.amazonaws.com/api"
+        },
+        {
+          "name": "PORT",
+          "value": "3000"
+        },
+        {
+          "name": "NEXTAUTH_SECRET",
+          "value": "+9fwchc7abffu3sgmZsfcU30gZzil2l2wQVT0c00c2I="
+        },
+        {
+          "name": "MONGODB_URI2",
+          "value": "mongodb+srv://boey:boeygaw530450@cluster0.zupfzym.mongodb.net/kanflow?retryWrites=true&w=majority&appName=Cluster0"
+        },
+        {
+          "name": "MONGODB_URI",
+          "value": "mongodb+srv://chonky:vu2B3dUGSRCymH@cluster0.ko0sn86.mongodb.net/kanban?retryWrites=true&w=majority&appName=Cluster0"
+        },
+        {
+          "name": "NEXTAUTH_URL",
+          "value": "kanbanLoadBalancer-125325032.ap-southeast-1.elb.amazonaws.com"
+        }
+      ],
       "mountPoints": [],
       "volumesFrom": [],
-      "ulimits": [],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
@@ -39,7 +66,7 @@
   "taskRoleArn": "arn:aws:iam::086164660957:role/fyp_kanban_task_definition",
   "executionRoleArn": "arn:aws:iam::086164660957:role/fyp_kanban_task_definition",
   "networkMode": "awsvpc",
-  "revision": 1,
+  "revision": 15,
   "volumes": [],
   "status": "ACTIVE",
   "requiresAttributes": [
@@ -77,13 +104,14 @@
   "placementConstraints": [],
   "compatibilities": ["EC2", "FARGATE"],
   "requiresCompatibilities": ["FARGATE"],
-  "cpu": "256",
-  "memory": "512",
+  "cpu": "512",
+  "memory": "1024",
   "runtimePlatform": {
     "cpuArchitecture": "X86_64",
     "operatingSystemFamily": "LINUX"
   },
-  "registeredAt": "2024-12-15T16:44:28.398Z",
+  "registeredAt": "2024-12-18T19:01:22.824Z",
   "registeredBy": "arn:aws:sts::086164660957:assumed-role/AWSReservedSSO_AdministratorAccess_c3cbbc3d573c7583/boeyadmin",
+  "enableFaultInjection": false,
   "tags": []
 }
